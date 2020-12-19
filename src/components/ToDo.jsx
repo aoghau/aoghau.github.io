@@ -1,12 +1,12 @@
 import React, { useState } from 'react';
-import { Card, Divider } from 'antd';
+import { Card, Divider, Button } from 'antd';
 import { ToDoItem } from './ToDoItem';
 import { ToDoForm } from './ToDoForm';
 
 export const ToDo = () => {
   const [todos, setTodos] = useState([
-    {id: 1, name: 'some', checked: false},
-    {id: 2, name: 'another one', checked: false}
+    {id: 1, title: 'Todo 1', desc : 'Example', date: new Date().toLocaleString().slice(0,17).replace(/\//g,'.').replace(/,/g, ' -'), checked: false},
+    {id: 2, title: 'Todo 2', desc : 'Another example', date: new Date().toLocaleString().slice(0,17).replace(/\//g,'.').replace(/,/g, ' -'), checked: false}
   ]);
   const [idCount, setIdCount] = useState(10);
 
@@ -38,29 +38,71 @@ export const ToDo = () => {
     if (index !== -1) {
       const todo = todos[index];
 
-      todo.checked = !todo.checked;
-      todos.splice(index, 1, todo);
-
+      todo.color = "teal";
+      todo.checked = !todo.checked;      
+      todos.splice(index, 1, todo);      
+      
       setTodos([...todos]);
-    }
+    }    
+    
   }
 
-  const onSubmit = (name) => {
+  const onSubmit = (title, desc) => {
+    if (title == null || desc == null || title.length < 3 || desc.length < 3 || title[0] != title[0].toUpperCase()) {
+      alert("Length of the field shouldn't be less than 3 characters. Title should start with a capital letter");
+    }
+      else {
     const todo = {
-      name,
+      title,
+      desc,
       id: idCount,
-      checked: false
+      checked: false,
+      date: new Date().toLocaleString().slice(0,17).replace(/\//g,'.').replace(/,/g, ' -')
     };
 
     setTodos([...todos, todo]);
     setIdCount(idCount + 1);
+    }
   } 
 
+  const removeChecked = () => { 
+    
+    let i = todos.length;
+    while (i--) {
+      if (todos[i].checked === true) {
+          todos.splice(i, 1);
+      }
+    }
+    
+    setTodos([...todos]);
+  }
+
+
+
+  const numberOfUnChecked = () => { 
+
+    let count = 0;
+
+    let i = todos.length;
+    while (i--) {
+      if (todos[i].checked === false) {
+          count++;
+      }
+    }
+
+    return count;
+  }
+
+
   return (
-    <Card title={'My todos'} className="todo-card">
+    <Card title={'Todo list'} className="todo-card">
       <ToDoForm onSubmit={onSubmit} />
       <Divider />
       { renderTodoItems(todos) }
+      <Divider />
+      <p>Number of Unchecked cards: <p className="todo-numberUnchecked">{numberOfUnChecked()}</p></p>
+      <Divider />
+      <Button htmlType="submit" type="primary" onClick={removeChecked}>Remove checked cards</Button>
     </Card>
   );
 }
